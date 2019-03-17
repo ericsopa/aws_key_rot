@@ -29,5 +29,5 @@ Assumptions:
   - Rotate Access Key
  
  ## Jenkins
- ### jenkins.sh
+ ### awskeyrot.sh
  Bash script that rotates the AWS IAM User Access Keys stored in Jenkins
