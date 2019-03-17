@@ -15,6 +15,7 @@ except IndexError as error:
 else:
     profile = sys.argv[1]
 
+# Function that lists keys
 def keylst():
     global akm
     akm = iam_client.list_access_keys(
@@ -22,6 +23,7 @@ def keylst():
     )
     return
 
+# Function that counts keys
 def keycnt():
     global akcnt
     akcnt = len([access_key['AccessKeyId'] for access_key in akm['AccessKeyMetadata']])
@@ -35,22 +37,9 @@ user = iam.User(profile)
 # Create list of access keys
 print "Create list of access keys from AWS API "
 keylst()
-#akm = iam_client.list_access_keys(
-#    UserName=profile
-#)
-## BEGIN DEBUG CODE
-#print "BEGIN DECODE OUTPUT"
-#print(akm) # print entire object
-#print "END DECODE OUTPUT"
-## END DEBUG CODE
 keycnt()
-#akcnt = len([access_key['AccessKeyId'] for access_key in akm['AccessKeyMetadata']])
-## BEGIN DEBUG CODE
-#print "BEGIN DECODE OUTPUT"
-#print (akcnt)
-#print "END DECODE OUTPUT"
-## END DEBUG CODE
 
+# Verify there is only one Access Key
 if akcnt == 1:
     print "There is one acccess key"
     oldaki = ([access_key['AccessKeyId'] for access_key in akm['AccessKeyMetadata']])
@@ -60,39 +49,23 @@ elif akcnt == 2:
 else:
     print "The environment is not sane! Exiting!"
     quit()
-# BEGIN DEBUG CODE
-#print "BEGIN DECODE OUTPUT"
-#print (oldaki)
-#print "END DECODE OUTPUT"
-# END DEBUG CODE
 
+# Create new Access Key in AWS
 print "Create second access key"
 newak = user.create_access_key_pair()
-print (newak)
-
 access_key_id = (newak.id)
 secret_access_key = (newak.secret)
 
-print (access_key_id)
-print (secret_access_key)
-
+# Rotate the Access Key where it's used
 cmd=('aws configure set aws_access_key_id ' + str(access_key_id) + ' --profile ' + str(profile))
-print (cmd)
 push=subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE)
-print push.returncode
 
 cmd=('aws configure set aws_secret_access_key ' + str(secret_access_key) + ' --profile ' + str(profile))
-print (cmd)
 push=subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE)
-print push.returncode
 
-# Create list of access keys
+# Delete old Access Key in AWS
 keylst()
 keycnt()
-#akm = iam_client.list_access_keys(
-#    UserName=profile
-#)
-#akcnt = len([access_key['AccessKeyId'] for access_key in akm['AccessKeyMetadata']])
 
 if akcnt == 1:
     print "There is ONLY one acccess key! Create must have failed! Exiting"
