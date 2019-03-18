@@ -76,7 +76,9 @@ elif akcnt == 2:
         UserName=profile,
         AccessKeyId=(oldaki[0])
     )
-    print (response)
+    retcode = response['ResponseMetadata']['HTTPStatusCode']
+    if retcode == 200:
+        print "Success! Old access key deleted!"
 else:
     print "The environment is not sane! Exiting!"
     quit()
